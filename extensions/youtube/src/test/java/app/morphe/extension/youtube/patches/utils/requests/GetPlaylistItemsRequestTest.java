@@ -17,13 +17,17 @@ import org.junit.jupiter.api.Test;
 class GetPlaylistItemsRequestTest {
 
     private static JSONObject response(JSONArray rows) throws Exception {
-        return new JSONObject().put("contents", new JSONObject().put("singleColumnBrowseResultsRenderer",
-                new JSONObject().put("tabs", new JSONArray().put(new JSONObject().put("tabRenderer",
-                        new JSONObject().put("content", new JSONObject().put("sectionListRenderer",
-                                new JSONObject().put("contents", new JSONArray().put(new JSONObject()
-                                        .put("itemSectionRenderer", new JSONObject().put("contents",
-                                                new JSONArray().put(new JSONObject().put("playlistVideoListRenderer",
-                                                        new JSONObject().put("contents", rows)))))))))))))));
+        var videoList = new JSONObject().put("playlistVideoListRenderer",
+                new JSONObject().put("contents", rows));
+        var itemSection = new JSONObject().put("itemSectionRenderer",
+                new JSONObject().put("contents", new JSONArray().put(videoList)));
+        var sectionList = new JSONObject().put("sectionListRenderer",
+                new JSONObject().put("contents", new JSONArray().put(itemSection)));
+        var tab = new JSONObject().put("tabRenderer",
+                new JSONObject().put("content", sectionList));
+        var browseResults = new JSONObject().put("singleColumnBrowseResultsRenderer",
+                new JSONObject().put("tabs", new JSONArray().put(tab)));
+        return new JSONObject().put("contents", browseResults);
     }
 
     private static JSONObject row(String videoId, String duration) throws Exception {

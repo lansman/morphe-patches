@@ -184,7 +184,7 @@ val downloadsPatch = bytecodePatch(
                     """
                 )
             }
-            classDef.methods.add(resolveQueuedCommand)
+            ResolveCommandFingerprint.classDef.methods.add(resolveQueuedCommand)
 
             addInstructionsWithLabels(
                 0,
