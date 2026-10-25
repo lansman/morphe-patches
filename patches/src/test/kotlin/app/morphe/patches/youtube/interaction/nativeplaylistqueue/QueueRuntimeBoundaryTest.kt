@@ -486,7 +486,11 @@ class QueueRuntimeBoundaryTest {
                 }
             """
         ).map { (name, source) -> File(output, "$name.java").apply { writeText(source.trimIndent()) } }
-        val fixture = File(output, "RuntimeFixture.java").apply {
+        // Give every generated fixture a distinct binary name. Reusing one FQCN across all
+        // scenarios can let a worker JVM resolve a previously loaded fixture from its parent
+        // class loader, which then lacks the method for the current scenario.
+        val fixtureClass = "RuntimeFixture_$scenario"
+        val fixture = File(output, "$fixtureClass.java").apply {
             writeText("""
                 package app.morphe.extension.youtube.patches.queue;
                 import android.content.SharedPreferences;
@@ -499,7 +503,7 @@ class QueueRuntimeBoundaryTest {
                 import java.lang.ref.WeakReference;
                 import java.lang.reflect.*;
                 import java.util.*;
-                public class RuntimeFixture {
+                public class $fixtureClass {
                     static Class<?> owner = NativePlaylistQueuePatch.class;
                     static Field field(String name) throws Exception {
                         Field value = owner.getDeclaredField(name); value.setAccessible(true); return value;
@@ -1568,7 +1572,7 @@ class QueueRuntimeBoundaryTest {
                 "-d", output.path, *stubs.map { it.path }.toTypedArray(), fixture.path))
             URLClassLoader(arrayOf(output.toURI().toURL(), classes.toURI().toURL()),
                 GeneratedMessageLite::class.java.classLoader).use { loader ->
-                loader.loadClass("app.morphe.extension.youtube.patches.queue.RuntimeFixture")
+                loader.loadClass("app.morphe.extension.youtube.patches.queue.$fixtureClass")
                     .getMethod(scenario).invoke(null)
             }
         } finally {
