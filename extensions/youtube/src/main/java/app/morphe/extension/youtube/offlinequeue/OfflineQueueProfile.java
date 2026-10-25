@@ -152,7 +152,8 @@ public final class OfflineQueueProfile {
 
     private static void readWeights(JSONObject json, Map<String, Double> destination) {
         if (json == null) return;
-        for (String key : json.keySet()) {
+        for (java.util.Iterator<String> keys = json.keys(); keys.hasNext();) {
+            String key = keys.next();
             double value = json.optDouble(key, 0);
             if (Double.isFinite(value) && value != 0) {
                 destination.put(key, Math.max(-MAX_ABSOLUTE_WEIGHT, Math.min(MAX_ABSOLUTE_WEIGHT, value)));
