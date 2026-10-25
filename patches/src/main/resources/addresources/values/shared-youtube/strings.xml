@@ -73,6 +73,14 @@ Second \"item\" text"</string>
     <string name="morphe_offline_queue_resolver_unavailable">Open any YouTube page and try again</string>
     <string name="morphe_offline_queue_queued">Queued %d videos for download</string>
     <string name="morphe_offline_queue_item">%1$s · %2$s%3$s</string>
+    <string name="morphe_offline_queue_learning_title">Learn from queue choices</string>
+    <string name="morphe_offline_queue_learning_summary">Rank future candidates locally from videos you keep, add, or remove</string>
+    <string name="morphe_offline_queue_seed_interests_title">Starting interests</string>
+    <string name="morphe_offline_queue_seed_interests_summary">Optional words or phrases separated by commas or new lines; leave empty for neutral learning</string>
+    <string name="morphe_offline_queue_reset_learning_title">Reset learned preferences</string>
+    <string name="morphe_offline_queue_reset_learning_summary">Clear local topic and channel weights</string>
+    <string name="morphe_offline_queue_reset_learning_confirm">Clear everything the offline queue learned from your choices?</string>
+    <string name="morphe_offline_queue_reset_learning_done">Offline queue preferences were reset</string>
     <string name="morphe_external_downloader_name_title">Downloader package name</string>
     <string name="morphe_external_downloader_name_summary">Package name of your installed external downloader app</string>
     <string name="morphe_external_downloader_other_item_hint">Enter package name</string>

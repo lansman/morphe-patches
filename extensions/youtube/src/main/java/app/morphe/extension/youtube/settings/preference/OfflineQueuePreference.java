@@ -19,6 +19,8 @@ import java.util.List;
 import app.morphe.extension.shared.Utils;
 import app.morphe.extension.shared.innertube.utils.AuthUtils;
 import app.morphe.extension.shared.patches.DownloadMode;
+import app.morphe.extension.youtube.offlinequeue.OfflineQueueLearning;
+import app.morphe.extension.youtube.offlinequeue.OfflineQueueProfile.Signal;
 import app.morphe.extension.youtube.patches.InAppDownloadsPatch;
 import app.morphe.extension.youtube.patches.utils.requests.GetPlaylistItemsRequest;
 import app.morphe.extension.youtube.patches.utils.requests.GetPlaylistItemsRequest.PlaylistItem;
@@ -81,7 +83,7 @@ public class OfflineQueuePreference extends Preference {
                     Utils.showToastLong(str("morphe_offline_queue_empty"));
                     return;
                 }
-                showPicker(context, items);
+                showPicker(context, OfflineQueueLearning.rank(items));
             });
         });
     }
@@ -105,6 +107,7 @@ public class OfflineQueuePreference extends Preference {
                 selectedSeconds += item.durationSeconds() > 0 ? item.durationSeconds() : 30 * 60;
             }
         }
+        boolean[] initiallySelected = selected.clone();
 
         new AlertDialog.Builder(context)
                 .setTitle(str("morphe_offline_queue_title"))
@@ -113,7 +116,14 @@ public class OfflineQueuePreference extends Preference {
                 .setPositiveButton(str("morphe_offline_queue_download_selected"), (dialog, which) -> {
                     int queued = 0;
                     for (int i = 0; i < items.size(); i++) {
-                        if (selected[i] && InAppDownloadsPatch.enqueueVideo(items.get(i).videoId())) queued++;
+                        if (selected[i] && InAppDownloadsPatch.enqueueVideo(items.get(i).videoId())) {
+                            queued++;
+                            OfflineQueueLearning.feedback(items.get(i), initiallySelected[i]
+                                    ? Signal.KEPT
+                                    : Signal.MANUAL_ADD);
+                        } else if (!selected[i] && initiallySelected[i]) {
+                            OfflineQueueLearning.feedback(items.get(i), Signal.REMOVED_DURING_REVIEW);
+                        }
                     }
                     Utils.showToastLong(queued == 0
                             ? str("morphe_offline_queue_resolver_unavailable")

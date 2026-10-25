@@ -12,10 +12,10 @@ import androidx.annotation.Nullable;
 
 import com.google.protobuf.MessageLite;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import app.morphe.extension.shared.Logger;

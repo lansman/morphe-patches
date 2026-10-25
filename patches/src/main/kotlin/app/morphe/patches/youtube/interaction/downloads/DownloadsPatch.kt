@@ -63,6 +63,13 @@ private val downloadsResourcePatch = resourcePatch {
                         selectable = true
                     ),
                     ListPreference("morphe_offline_queue_target_hours"),
+                    SwitchPreference("morphe_offline_queue_learning", summary = true),
+                    TextPreference("morphe_offline_queue_seed_interests"),
+                    NonInteractivePreference(
+                        key = "morphe_offline_queue_reset_learning",
+                        tag = "app.morphe.extension.youtube.settings.preference.OfflineQueueResetPreference",
+                        selectable = true
+                    ),
                     SwitchPreference("morphe_external_downloader_overlay_button", summary = true),
                     TextPreference(
                         "morphe_external_downloader_name",

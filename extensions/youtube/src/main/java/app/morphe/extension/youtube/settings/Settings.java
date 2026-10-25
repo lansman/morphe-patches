@@ -306,6 +306,9 @@ public class Settings extends SharedYouTubeSettings {
     public static final BooleanSetting EXTERNAL_DOWNLOADER_QUICK_MENU = new BooleanSetting("morphe_external_downloader_quick_menu", FALSE, new ExternalDownloaderAvailability());
     public static final BooleanSetting EXTERNAL_DOWNLOADER_MARK_WATCHED = new BooleanSetting("morphe_external_downloader_mark_watched", FALSE, new ExternalDownloaderAvailability());
     public static final IntegerSetting OFFLINE_QUEUE_TARGET_HOURS = new IntegerSetting("morphe_offline_queue_target_hours", 5);
+    public static final BooleanSetting OFFLINE_QUEUE_LEARNING = new BooleanSetting("morphe_offline_queue_learning", FALSE);
+    public static final StringSetting OFFLINE_QUEUE_SEED_INTERESTS = new StringSetting("morphe_offline_queue_seed_interests", "");
+    public static final StringSetting OFFLINE_QUEUE_LEARNING_DATA = new StringSetting("morphe_offline_queue_learning_data", "", false, false);
 
     // Overlay buttons
     public static final BooleanSetting FULLSCREEN_VIDEO_SCALE_BUTTON = new BooleanSetting("morphe_fullscreen_video_scale_button", FALSE, true);

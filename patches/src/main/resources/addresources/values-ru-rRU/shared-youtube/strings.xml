@@ -68,6 +68,14 @@ Second \"item\" text"</string>
   <string name="morphe_offline_queue_resolver_unavailable">Откройте любую страницу YouTube и повторите попытку</string>
   <string name="morphe_offline_queue_queued">Добавлено в очередь загрузки: %d</string>
   <string name="morphe_offline_queue_item">%1$s · %2$s%3$s</string>
+  <string name="morphe_offline_queue_learning_title">Учиться на выборе роликов</string>
+  <string name="morphe_offline_queue_learning_summary">Локально ранжировать следующие подборки по добавленным, оставленным и снятым роликам</string>
+  <string name="morphe_offline_queue_seed_interests_title">Начальные интересы</string>
+  <string name="morphe_offline_queue_seed_interests_summary">Необязательные слова или фразы через запятую либо с новой строки; оставьте пустым для нейтрального обучения</string>
+  <string name="morphe_offline_queue_reset_learning_title">Сбросить изученные предпочтения</string>
+  <string name="morphe_offline_queue_reset_learning_summary">Очистить локальные веса тем и каналов</string>
+  <string name="morphe_offline_queue_reset_learning_confirm">Очистить всё, чему офлайн-очередь научилась на вашем выборе?</string>
+  <string name="morphe_offline_queue_reset_learning_done">Предпочтения офлайн-очереди сброшены</string>
   <string name="morphe_external_downloader_name_title">Имя пакета загрузчика</string>
   <string name="morphe_external_downloader_name_summary">Имя пакета вашего установленного внешнего приложения для загрузки</string>
   <string name="morphe_external_downloader_other_item_hint">Введите имя пакета</string>
