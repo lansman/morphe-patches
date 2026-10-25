@@ -61,12 +61,16 @@ public final class OfflineQueueProfile {
     }
 
     public String toJson() {
-        return new JSONObject()
-                .put("schemaVersion", 1)
-                .put("signalCount", signalCount)
-                .put("terms", new JSONObject(termWeights))
-                .put("channels", new JSONObject(channelWeights))
-                .toString();
+        try {
+            return new JSONObject()
+                    .put("schemaVersion", 1)
+                    .put("signalCount", signalCount)
+                    .put("terms", new JSONObject(termWeights))
+                    .put("channels", new JSONObject(channelWeights))
+                    .toString();
+        } catch (Exception ignored) {
+            return "{}";
+        }
     }
 
     public int signalCount() {
