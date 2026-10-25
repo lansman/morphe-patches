@@ -486,11 +486,7 @@ class QueueRuntimeBoundaryTest {
                 }
             """
         ).map { (name, source) -> File(output, "$name.java").apply { writeText(source.trimIndent()) } }
-        // Give every generated fixture a distinct binary name. Reusing one FQCN across all
-        // scenarios can let a worker JVM resolve a previously loaded fixture from its parent
-        // class loader, which then lacks the method for the current scenario.
-        val fixtureClass = "RuntimeFixture_$scenario"
-        val fixture = File(output, "$fixtureClass.java").apply {
+        val fixture = File(output, "RuntimeFixture.java").apply {
             writeText("""
                 package app.morphe.extension.youtube.patches.queue;
                 import android.content.SharedPreferences;
@@ -503,7 +499,7 @@ class QueueRuntimeBoundaryTest {
                 import java.lang.ref.WeakReference;
                 import java.lang.reflect.*;
                 import java.util.*;
-                public class $fixtureClass {
+                public class RuntimeFixture {
                     static Class<?> owner = NativePlaylistQueuePatch.class;
                     static Field field(String name) throws Exception {
                         Field value = owner.getDeclaredField(name); value.setAccessible(true); return value;
@@ -1510,13 +1506,13 @@ class QueueRuntimeBoundaryTest {
                     }
                     public static void queueTypeSelection() throws Exception {
                         Settings.QUEUE_TYPE.value = QueueType.NATIVE;
-                        require(!(boolean) call("isNativeQueueDisabled"), "Native queue type must enable native queue");
+                        require(AddToQueuePatch.isNativeQueueEnabled(), "Native queue type must enable native queue");
                         Settings.QUEUE_TYPE.value = QueueType.MORPHE;
-                        require((boolean) call("isNativeQueueDisabled"), "Morphe queue type must disable native queue");
+                        require(!AddToQueuePatch.isNativeQueueEnabled(), "Morphe queue type must disable native queue");
                         Settings.QUEUE_TYPE.value = QueueType.LOCAL;
-                        require((boolean) call("isNativeQueueDisabled"), "Premium-style queue type must disable native queue");
+                        require(!AddToQueuePatch.isNativeQueueEnabled(), "Premium-style queue type must disable native queue");
                         Settings.QUEUE_TYPE.value = QueueType.DEFAULT;
-                        require((boolean) call("isNativeQueueDisabled"), "Default queue type must disable native queue");
+                        require(!AddToQueuePatch.isNativeQueueEnabled(), "Default queue type must disable native queue");
                     }
                     public static void acceptedHandoff() throws Exception {
                         Settings.QUEUE_TYPE.value = QueueType.NATIVE;
@@ -1572,7 +1568,7 @@ class QueueRuntimeBoundaryTest {
                 "-d", output.path, *stubs.map { it.path }.toTypedArray(), fixture.path))
             URLClassLoader(arrayOf(output.toURI().toURL(), classes.toURI().toURL()),
                 GeneratedMessageLite::class.java.classLoader).use { loader ->
-                loader.loadClass("app.morphe.extension.youtube.patches.queue.$fixtureClass")
+                loader.loadClass("app.morphe.extension.youtube.patches.queue.RuntimeFixture")
                     .getMethod(scenario).invoke(null)
             }
         } finally {
