@@ -7,30 +7,30 @@
 
 package app.morphe.extension.youtube.offlinequeue;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import app.morphe.extension.youtube.patches.utils.requests.GetPlaylistItemsRequest.PlaylistItem;
 
-class OfflineQueueProfileTest {
+public class OfflineQueueProfileTest {
 
     private static PlaylistItem item(String id, String title, String channel) {
         return new PlaylistItem(id, "", title, channel, 1800);
     }
 
     @Test
-    void coldStartPreservesServerOrder() {
+    public void coldStartPreservesServerOrder() {
         OfflineQueueProfile profile = new OfflineQueueProfile();
         var source = List.of(item("aaaaaaaaaaa", "One", "A"), item("bbbbbbbbbbb", "Two", "B"));
         assertEquals(source, profile.rank(source, ""));
     }
 
     @Test
-    void freeFormSeedsWorkWithoutBundledCategories() {
+    public void freeFormSeedsWorkWithoutBundledCategories() {
         OfflineQueueProfile profile = new OfflineQueueProfile();
         var source = List.of(
                 item("aaaaaaaaaaa", "A cooking lesson", "A"),
@@ -39,7 +39,7 @@ class OfflineQueueProfileTest {
     }
 
     @Test
-    void acceptedAndRejectedTopicsMoveInOppositeDirections() {
+    public void acceptedAndRejectedTopicsMoveInOppositeDirections() {
         OfflineQueueProfile profile = new OfflineQueueProfile();
         PlaylistItem engineering = item("aaaaaaaaaaa", "Engineering design review", "Lab");
         PlaylistItem crime = item("bbbbbbbbbbb", "True crime documentary", "Cases");
@@ -49,7 +49,7 @@ class OfflineQueueProfileTest {
     }
 
     @Test
-    void profileRoundTripsAsJson() {
+    public void profileRoundTripsAsJson() {
         OfflineQueueProfile profile = new OfflineQueueProfile();
         PlaylistItem item = item("aaaaaaaaaaa", "Technical news", "Lab");
         profile.apply(item, OfflineQueueProfile.Signal.WATCHED);

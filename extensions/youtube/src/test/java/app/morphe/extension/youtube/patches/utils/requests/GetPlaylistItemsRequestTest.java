@@ -7,14 +7,14 @@
 
 package app.morphe.extension.youtube.patches.utils.requests;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
-class GetPlaylistItemsRequestTest {
+public class GetPlaylistItemsRequestTest {
 
     private static JSONObject response(JSONArray rows) throws Exception {
         var videoList = new JSONObject().put("playlistVideoListRenderer",
@@ -42,7 +42,7 @@ class GetPlaylistItemsRequestTest {
     }
 
     @Test
-    void parsesOrderedPlaylistMetadata() throws Exception {
+    public void parsesOrderedPlaylistMetadata() throws Exception {
         var items = GetPlaylistItemsRequest.parseItems(response(new JSONArray()
                 .put(row("abcdefghijk", "1:02:03"))
                 .put(row("lmnopqrstuv", "04:05"))));
@@ -56,7 +56,7 @@ class GetPlaylistItemsRequestTest {
     }
 
     @Test
-    void ignoresNonVideoRowsAndMissingContents() throws Exception {
+    public void ignoresNonVideoRowsAndMissingContents() throws Exception {
         var items = GetPlaylistItemsRequest.parseItems(response(new JSONArray()
                 .put(new JSONObject().put("continuationItemRenderer", new JSONObject()))));
         assertNull(items);
