@@ -56,7 +56,7 @@ class GetPlaylistItemsRequestTest {
     }
 
     @Test
-    void ignores nonVideoRowsAndMissingContents() throws Exception {
+    void ignoresNonVideoRowsAndMissingContents() throws Exception {
         var items = GetPlaylistItemsRequest.parseItems(response(new JSONArray()
                 .put(new JSONObject().put("continuationItemRenderer", new JSONObject()))));
         assertNull(items);
