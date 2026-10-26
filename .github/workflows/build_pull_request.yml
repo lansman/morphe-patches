@@ -5,7 +5,6 @@ on:
   push:
     branches:
       - dev
-      - feat/offline-queue-personalization
   pull_request:
     branches:
       - dev
