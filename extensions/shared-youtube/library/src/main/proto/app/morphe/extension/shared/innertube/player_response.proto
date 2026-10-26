@@ -63,6 +63,8 @@ message StreamingData {
 message Format {
   optional int32 itag = 1;
   optional int32 bitrate = 6;
+  optional int32 width = 7;
+  optional int32 height = 8;
   optional int32 averageBitrate = 31;
   optional int32 audioChannels = 46;
   optional int64 approxDurationMs = 44;

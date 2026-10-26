@@ -44,6 +44,16 @@ import com.android.tools.smali.dexlib2.iface.reference.TypeReference
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethod
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethodParameter
 
+private val LOCAL_DOWNLOAD_PERMISSIONS = listOf(
+    "android.permission.WAKE_LOCK",
+    "android.permission.FOREGROUND_SERVICE",
+    "android.permission.FOREGROUND_SERVICE_DATA_SYNC",
+    "android.permission.POST_NOTIFICATIONS",
+)
+
+private const val LOCAL_DOWNLOAD_SERVICE =
+    "app.morphe.extension.youtube.downloads.LocalVideoDownloadService"
+
 private val downloadsResourcePatch = resourcePatch {
     dependsOn(
         legacyPlayerControlsPatch,
@@ -57,6 +67,11 @@ private val downloadsResourcePatch = resourcePatch {
                 sorting = Sorting.UNSORTED,
                 preferences = setOf(
                     ListPreference("morphe_download_mode"),
+                    NonInteractivePreference(
+                        key = "morphe_local_downloads_open",
+                        tag = "app.morphe.extension.youtube.settings.preference.LocalVideoDownloadsPreference",
+                        selectable = true
+                    ),
                     NonInteractivePreference(
                         key = "morphe_offline_queue_open",
                         tag = "app.morphe.extension.youtube.settings.preference.OfflineQueuePreference",
@@ -93,6 +108,27 @@ private val downloadsResourcePatch = resourcePatch {
                 "morphe_external_downloader_quick_audio_bold.xml"
             )
         )
+
+        val manifest = get("AndroidManifest.xml")
+        var xml = manifest.readText()
+        for (permission in LOCAL_DOWNLOAD_PERMISSIONS) {
+            val declaration = "android:name=\"$permission\""
+            if (!xml.contains(declaration)) {
+                xml = xml.replace(
+                    "<application",
+                    "<uses-permission $declaration />\n    <application"
+                )
+            }
+        }
+        if (!xml.contains(LOCAL_DOWNLOAD_SERVICE)) {
+            xml = xml.replace(
+                "</application>",
+                "<service android:name=\"$LOCAL_DOWNLOAD_SERVICE\" " +
+                    "android:exported=\"false\" android:foregroundServiceType=\"dataSync\" />\n" +
+                    "</application>"
+            )
+        }
+        manifest.writeText(xml)
     }
 
     finalize {
@@ -116,9 +152,8 @@ private const val GET_GENERATED_REGISTRY =
 @Suppress("unused")
 val downloadsPatch = bytecodePatch(
     name = "Downloads",
-    description = "Adds support to download videos with an external downloader app " +
-        "using the in-app download button or a video player action button, " +
-        "and adds an option to download videos in-app.",
+    description = "Adds subscription-independent local downloads inside YouTube, " +
+        "and support for external downloader apps.",
 ) {
     dependsOn(
         downloadsResourcePatch,

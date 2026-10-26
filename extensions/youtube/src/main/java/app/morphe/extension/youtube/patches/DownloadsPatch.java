@@ -13,6 +13,7 @@ package app.morphe.extension.youtube.patches;
 import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.Utils;
 import app.morphe.extension.shared.patches.DownloadMode;
+import app.morphe.extension.youtube.downloads.LocalVideoDownloadManager;
 import app.morphe.extension.youtube.settings.Settings;
 import app.morphe.extension.youtube.videoplayer.ExternalDownloadButton;
 
@@ -30,7 +31,12 @@ public final class DownloadsPatch {
      */
     public static boolean inAppDownloadButtonOnClick(String videoId) {
         try {
-            if (Settings.DOWNLOAD_MODE.get() != DownloadMode.EXTERNAL) {
+            DownloadMode mode = Settings.DOWNLOAD_MODE.get();
+            if (mode == DownloadMode.IN_APP) {
+                LocalVideoDownloadManager.showQualityPicker(Utils.getActivity(), videoId);
+                return true;
+            }
+            if (mode != DownloadMode.EXTERNAL) {
                 return false;
             }
 
