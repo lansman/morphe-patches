@@ -152,6 +152,7 @@ val downloadsPatch = bytecodePatch(
 
         // Save the video instead of asking the server for the download action, which answers with the Premium upsell.
         ResolveCommandFingerprint.method.apply {
+            val resolveCommandMethod = this
             val commandType = parameterTypes.first().toString()
 
             // Keep a resolver owned by the current activity, so the extension can enqueue the
@@ -186,7 +187,7 @@ val downloadsPatch = bytecodePatch(
                         check-cast v0, $commandType
                         invoke-static { }, Ljava/util/Collections;->emptyMap()Ljava/util/Map;
                         move-result-object v1
-                        invoke-virtual { p0, v0, v1 }, $this
+                        invoke-virtual { p0, v0, v1 }, $resolveCommandMethod
                         return-void
                     """
                 )
