@@ -1,0 +1,9 @@
+*.json
+*.bin
+*.stream
+*.exo
+*.exi
+*.mp4
+*.jpg
+*.err
+__pycache__/

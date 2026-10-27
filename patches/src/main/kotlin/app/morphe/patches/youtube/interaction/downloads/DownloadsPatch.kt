@@ -54,6 +54,9 @@ private val LOCAL_DOWNLOAD_PERMISSIONS = listOf(
 private const val LOCAL_DOWNLOAD_SERVICE =
     "app.morphe.extension.youtube.downloads.LocalVideoDownloadService"
 
+private const val LOCAL_DOWNLOAD_ACTIVITY =
+    "app.morphe.extension.youtube.downloads.LocalDownloadsActivity"
+
 private val downloadsResourcePatch = resourcePatch {
     dependsOn(
         legacyPlayerControlsPatch,
@@ -105,7 +108,8 @@ private val downloadsResourcePatch = resourcePatch {
                 "morphe_external_downloader_quick_video.xml",
                 "morphe_external_downloader_quick_video_bold.xml",
                 "morphe_external_downloader_quick_audio.xml",
-                "morphe_external_downloader_quick_audio_bold.xml"
+                "morphe_external_downloader_quick_audio_bold.xml",
+                "morphe_local_downloads_launcher.xml"
             )
         )
 
@@ -126,6 +130,20 @@ private val downloadsResourcePatch = resourcePatch {
                 "<service android:name=\"$LOCAL_DOWNLOAD_SERVICE\" " +
                     "android:exported=\"false\" android:foregroundServiceType=\"dataSync\" />\n" +
                     "</application>"
+            )
+        }
+        if (!xml.contains(LOCAL_DOWNLOAD_ACTIVITY)) {
+            xml = xml.replace(
+                "</application>",
+                "<activity android:name=\"$LOCAL_DOWNLOAD_ACTIVITY\" " +
+                    "android:exported=\"true\" android:launchMode=\"singleTask\" " +
+                    "android:taskAffinity=\"\" " +
+                    "android:theme=\"@android:style/Theme.DeviceDefault.NoActionBar\" " +
+                    "android:label=\"@string/morphe_local_downloads_launcher_title\" " +
+                    "android:icon=\"@drawable/morphe_local_downloads_launcher\">" +
+                    "<intent-filter><action android:name=\"android.intent.action.MAIN\" />" +
+                    "<category android:name=\"android.intent.category.LAUNCHER\" />" +
+                    "</intent-filter></activity>\n</application>"
             )
         }
         manifest.writeText(xml)

@@ -59,6 +59,16 @@ Second \"item\" text"</string>
     <string name="morphe_local_downloads_open_title">Local downloads</string>
     <string name="morphe_local_downloads_open_summary">Videos stored locally without a YouTube Premium entitlement check</string>
     <string name="morphe_local_downloads_title">Local downloads</string>
+    <string name="morphe_local_downloads_launcher_title">Downloaded videos</string>
+    <string name="morphe_local_downloads_actions">Library actions</string>
+    <string name="morphe_local_downloads_pin">Add to home screen</string>
+    <string name="morphe_local_downloads_pin_unavailable">This launcher does not support adding the shortcut automatically.</string>
+    <string name="morphe_local_downloads_migrate">Prepare old downloads for transfer</string>
+    <string name="morphe_local_downloads_migrate_description">Decrypt the old YouTube cache for transfer to ordinary video files. Original downloads will be kept. This preparation needs additional free space and does not add videos to this list until conversion is finished.</string>
+    <string name="morphe_local_downloads_migrate_start">Prepare</string>
+    <string name="morphe_local_downloads_migrate_running">Preparing files. Keep the app open. Original downloads are kept.</string>
+    <string name="morphe_local_downloads_migrate_ready">Prepared streams: %1$d. Skipped groups: %2$d. The original downloads are kept; conversion and import are still required.</string>
+    <string name="morphe_local_downloads_migrate_failed">Could not prepare the files. Original downloads are kept.</string>
     <string name="morphe_local_downloads_empty">No local videos yet. Use Download on a video to save it here.</string>
     <string name="morphe_local_downloads_summary">%1$d videos · %2$s MB</string>
     <string name="morphe_local_download_quality_title">Video quality</string>

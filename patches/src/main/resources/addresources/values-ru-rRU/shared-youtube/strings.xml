@@ -54,6 +54,16 @@ Second \"item\" text"</string>
   <string name="morphe_local_downloads_open_title">Локальные загрузки</string>
   <string name="morphe_local_downloads_open_summary">Видео хранятся локально без проверки подписки YouTube Premium</string>
   <string name="morphe_local_downloads_title">Локальные загрузки</string>
+  <string name="morphe_local_downloads_launcher_title">Скачанные видео</string>
+  <string name="morphe_local_downloads_actions">Действия с библиотекой</string>
+  <string name="morphe_local_downloads_pin">Добавить на рабочий стол</string>
+  <string name="morphe_local_downloads_pin_unavailable">Этот рабочий стол не поддерживает автоматическое добавление ярлыка.</string>
+  <string name="morphe_local_downloads_migrate">Подготовить перенос старых загрузок</string>
+  <string name="morphe_local_downloads_migrate_description">Расшифровать старый кэш YouTube для переноса в обычные видеофайлы. Исходные загрузки сохранятся. Для подготовки нужно дополнительное свободное место; видео появятся в этом списке после преобразования и импорта.</string>
+  <string name="morphe_local_downloads_migrate_start">Подготовить</string>
+  <string name="morphe_local_downloads_migrate_running">Подготавливаю файлы. Оставьте приложение открытым. Исходные загрузки сохраняются.</string>
+  <string name="morphe_local_downloads_migrate_ready">Подготовлено потоков: %1$d. Пропущено групп: %2$d. Исходные загрузки сохранены; ещё нужны преобразование и импорт.</string>
+  <string name="morphe_local_downloads_migrate_failed">Не удалось подготовить файлы. Исходные загрузки сохранены.</string>
   <string name="morphe_local_downloads_empty">Локальных видео пока нет. Нажмите «Скачать» у нужного видео.</string>
   <string name="morphe_local_downloads_summary">Видео: %1$d · %2$s МБ</string>
   <string name="morphe_local_download_quality_title">Качество видео</string>
