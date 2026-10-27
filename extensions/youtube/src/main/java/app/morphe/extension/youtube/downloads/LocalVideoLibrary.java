@@ -18,6 +18,7 @@ import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.pm.ShortcutInfo;
 import android.content.pm.ShortcutManager;
+import android.content.res.ColorStateList;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Icon;
@@ -27,17 +28,21 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.MediaController;
 import android.widget.PopupMenu;
+import android.widget.ProgressBar;
 import android.widget.ScrollView;
+import android.widget.Spinner;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
-import android.widget.VideoView;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import app.morphe.extension.shared.Utils;
 
@@ -49,6 +54,7 @@ public final class LocalVideoLibrary {
     private static final int PRIMARY = Color.WHITE;
     private static final int SECONDARY = Color.rgb(185, 185, 185);
     private static final String LIST_TAG = "morphe.local.downloads.list";
+    private static final String DELETE_WATCHED_TAG = "morphe.local.downloads.delete.watched";
 
     private LocalVideoLibrary() {
     }
@@ -88,6 +94,10 @@ public final class LocalVideoLibrary {
         menu.setContentDescription(str("morphe_local_downloads_actions"));
         menu.setOnClickListener(view -> {
             PopupMenu popup = new PopupMenu(context, menu);
+            popup.getMenu().add(str("morphe_local_download_quality_settings_title")).setOnMenuItemClickListener(item -> {
+                showDownloadQualitySettings(context);
+                return true;
+            });
             popup.getMenu().add(str("morphe_local_downloads_pin")).setOnMenuItemClickListener(item -> {
                 pinShortcut(context);
                 return true;
@@ -102,6 +112,25 @@ public final class LocalVideoLibrary {
         root.addView(toolbar, new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
+        Button deleteWatched = new Button(context);
+        deleteWatched.setTag(DELETE_WATCHED_TAG);
+        deleteWatched.setAllCaps(false);
+        deleteWatched.setTextSize(16);
+        deleteWatched.setTextColor(PRIMARY);
+        deleteWatched.setBackgroundColor(SURFACE);
+        deleteWatched.setMinHeight(dp(context, 48));
+        android.graphics.drawable.Drawable trash = context.getDrawable(android.R.drawable.ic_menu_delete).mutate();
+        trash.setTint(PRIMARY);
+        trash.setBounds(0, 0, dp(context, 24), dp(context, 24));
+        deleteWatched.setCompoundDrawablesRelative(trash, null, null, null);
+        deleteWatched.setCompoundDrawablePadding(dp(context, 8));
+        deleteWatched.setPadding(dp(context, 16), dp(context, 10), dp(context, 16), dp(context, 10));
+        deleteWatched.setTooltipText(str("morphe_local_download_progress_note"));
+        LinearLayout.LayoutParams deleteParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        deleteParams.setMargins(dp(context, 12), 0, dp(context, 12), dp(context, 8));
+        root.addView(deleteWatched, deleteParams);
+
         ScrollView scroll = new ScrollView(context);
         LinearLayout list = new LinearLayout(context);
         list.setTag(LIST_TAG);
@@ -111,6 +140,7 @@ public final class LocalVideoLibrary {
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         root.addView(scroll, new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, 0, 1));
+        deleteWatched.setOnClickListener(view -> confirmDeleteWatched(context, list));
 
         populate(context, list);
         dialog.setContentView(root);
@@ -127,6 +157,95 @@ public final class LocalVideoLibrary {
         if (window == null) return;
         View list = window.getDecorView().findViewWithTag(LIST_TAG);
         if (list instanceof LinearLayout) populate(dialog.getContext(), (LinearLayout) list);
+    }
+
+    /** Also available from Morphe download settings, without opening a video. */
+    public static void showDownloadQualitySettings(Context context) {
+        int[] heights = {2160, 1440, 1080, 720, 480, 360, 240, 144};
+        LinearLayout body = new LinearLayout(context);
+        body.setOrientation(LinearLayout.VERTICAL);
+        body.setPadding(dp(context, 20), dp(context, 8), dp(context, 20), dp(context, 8));
+        CheckBox ask = new CheckBox(context);
+        ask.setText(str("morphe_local_download_ask_quality"));
+        ask.setChecked(LocalVideoDownloadPreferences.shouldAsk(context));
+        ask.setMinHeight(dp(context, 48));
+        body.addView(ask);
+        TextView qualityLabel = new TextView(context);
+        qualityLabel.setText(str("morphe_local_download_preferred_quality"));
+        qualityLabel.setTextSize(16);
+        body.addView(qualityLabel);
+        Spinner quality = new Spinner(context);
+        String[] labels = new String[heights.length];
+        int selected = 3;
+        for (int i = 0; i < heights.length; i++) {
+            labels[i] = heights[i] + "p";
+            if (heights[i] == LocalVideoDownloadPreferences.preferredHeight(context)) selected = i;
+        }
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(context,
+                android.R.layout.simple_spinner_item, labels);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        quality.setAdapter(adapter);
+        quality.setSelection(selected);
+        quality.setMinimumHeight(dp(context, 48));
+        body.addView(quality, new LinearLayout.LayoutParams(-1, -2));
+        TextView explanation = new TextView(context);
+        explanation.setText(str("morphe_local_download_quality_fallback"));
+        explanation.setTextSize(14);
+        explanation.setPadding(0, dp(context, 8), 0, 0);
+        body.addView(explanation);
+        new AlertDialog.Builder(context)
+                .setTitle(str("morphe_local_download_quality_settings_title"))
+                .setView(body).setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(android.R.string.ok, (dialog, which) ->
+                        LocalVideoDownloadPreferences.save(context,
+                                heights[quality.getSelectedItemPosition()], ask.isChecked()))
+                .show();
+    }
+
+    private static void confirmDeleteWatched(Context context, LinearLayout list) {
+        List<LocalVideo> watched = new ArrayList<>();
+        for (LocalVideo video : LocalVideoStorage.list(context)) {
+            if (LocalVideoWatchProgress.read(context, video.videoId()).watched) watched.add(video);
+        }
+        if (watched.isEmpty()) {
+            Utils.showToastLong(str("morphe_local_download_no_watched"));
+            return;
+        }
+        CharSequence[] titles = new CharSequence[watched.size()];
+        boolean[] selected = new boolean[watched.size()];
+        Arrays.fill(selected, true);
+        for (int i = 0; i < titles.length; i++) titles[i] = watched.get(i).title();
+        AlertDialog confirm = new AlertDialog.Builder(context)
+                .setTitle(str("morphe_local_download_delete_watched_title"))
+                .setMultiChoiceItems(titles, selected, (dialog, which, checked) -> {
+                    selected[which] = checked;
+                    updateDeleteSelection((AlertDialog) dialog, selected);
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(str("morphe_local_download_delete"), (dialog, which) -> {
+                    int deleted = 0, failed = 0;
+                    for (int i = 0; i < selected.length; i++) {
+                        if (!selected[i]) continue;
+                        LocalVideo video = watched.get(i);
+                        // Recheck the snapshot at confirmation; unknown progress is kept.
+                        if (!LocalVideoWatchProgress.read(context, video.videoId()).watched) continue;
+                        LocalVideoPlayer.closeIfPlaying(video.videoId());
+                        if (LocalVideoStorage.delete(context, video)) deleted++;
+                        else failed++;
+                    }
+                    populate(context, list);
+                    Utils.showToastLong(str("morphe_local_download_delete_result", deleted, failed));
+                }).create();
+        confirm.setOnShowListener(ignored -> updateDeleteSelection(confirm, selected));
+        confirm.show();
+    }
+
+    private static void updateDeleteSelection(AlertDialog dialog, boolean[] selected) {
+        int count = 0;
+        for (boolean value : selected) if (value) count++;
+        Button delete = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        delete.setText(str("morphe_local_download_delete_selected", count));
+        delete.setEnabled(count > 0);
     }
 
     private static void pinShortcut(Context context) {
@@ -196,6 +315,16 @@ public final class LocalVideoLibrary {
     private static void populate(Context context, LinearLayout list) {
         list.removeAllViews();
         List<LocalVideo> videos = LocalVideoStorage.list(context);
+        int watched = 0;
+        for (LocalVideo video : videos) {
+            if (LocalVideoWatchProgress.read(context, video.videoId()).watched) watched++;
+        }
+        View bulk = list.getRootView().findViewWithTag(DELETE_WATCHED_TAG);
+        if (bulk instanceof Button) {
+            ((Button) bulk).setText(str("morphe_local_download_delete_watched", watched));
+            bulk.setEnabled(watched > 0);
+            bulk.setAlpha(watched > 0 ? 1f : .45f);
+        }
         if (videos.isEmpty()) {
             TextView empty = text(context, str("morphe_local_downloads_empty"), 17, SECONDARY);
             empty.setGravity(Gravity.CENTER);
@@ -210,6 +339,9 @@ public final class LocalVideoLibrary {
                 str("morphe_local_downloads_summary", videos.size(), megabytes(total)), 15, SECONDARY);
         summary.setPadding(dp(context, 8), dp(context, 4), dp(context, 8), dp(context, 14));
         list.addView(summary);
+        TextView progressNote = text(context, str("morphe_local_download_progress_note"), 13, SECONDARY);
+        progressNote.setPadding(dp(context, 8), 0, dp(context, 8), dp(context, 10));
+        list.addView(progressNote);
 
         for (LocalVideo video : videos) list.addView(row(context, list, video));
     }
@@ -220,7 +352,7 @@ public final class LocalVideoLibrary {
         row.setGravity(Gravity.CENTER_VERTICAL);
         row.setPadding(dp(context, 10), dp(context, 10), dp(context, 6), dp(context, 10));
         row.setBackgroundColor(SURFACE);
-        row.setOnClickListener(view -> play(context, video));
+        row.setOnClickListener(view -> LocalVideoPlayer.play(context, video, () -> populate(context, list)));
 
         ImageView thumbnail = new ImageView(context);
         thumbnail.setScaleType(ImageView.ScaleType.CENTER_CROP);
@@ -229,7 +361,17 @@ public final class LocalVideoLibrary {
         } else {
             thumbnail.setBackgroundColor(Color.DKGRAY);
         }
-        row.addView(thumbnail, new LinearLayout.LayoutParams(dp(context, 168), dp(context, 95)));
+        LocalVideoWatchProgress.Snapshot progress = LocalVideoWatchProgress.read(context, video.videoId());
+        FrameLayout preview = new FrameLayout(context);
+        preview.addView(thumbnail, new FrameLayout.LayoutParams(-1, -1));
+        ProgressBar bar = new ProgressBar(context, null, android.R.attr.progressBarStyleHorizontal);
+        bar.setMax(100);
+        bar.setProgress(progress.progressPercent);
+        bar.setProgressTintList(ColorStateList.valueOf(Color.rgb(244, 67, 54)));
+        bar.setProgressBackgroundTintList(ColorStateList.valueOf(Color.rgb(85, 85, 85)));
+        bar.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+        preview.addView(bar, new FrameLayout.LayoutParams(-1, dp(context, 4), Gravity.BOTTOM));
+        row.addView(preview, new LinearLayout.LayoutParams(dp(context, 168), dp(context, 95)));
 
         LinearLayout details = new LinearLayout(context);
         details.setOrientation(LinearLayout.VERTICAL);
@@ -245,6 +387,12 @@ public final class LocalVideoLibrary {
         TextView metadata = text(context, subtitle, 13, SECONDARY);
         metadata.setMaxLines(2);
         details.addView(metadata);
+        if (progress.watched || progress.positionMs > 0) {
+            String label = progress.watched ? str("morphe_local_download_watched")
+                    : str("morphe_local_download_resume_position", formatDuration((int) (progress.positionMs / 1000)),
+                            formatDuration((int) (progress.durationMs / 1000)));
+            details.addView(text(context, label, 13, progress.watched ? Color.rgb(135, 242, 191) : SECONDARY));
+        }
         row.addView(details, new LinearLayout.LayoutParams(0,
                 ViewGroup.LayoutParams.WRAP_CONTENT, 1));
 
@@ -259,6 +407,7 @@ public final class LocalVideoLibrary {
                 .setMessage(video.title())
                 .setNegativeButton(android.R.string.cancel, null)
                 .setPositiveButton(str("morphe_local_download_delete"), (dialog, which) -> {
+                    LocalVideoPlayer.closeIfPlaying(video.videoId());
                     if (!LocalVideoStorage.delete(context, video)) {
                         Utils.showToastLong(str("morphe_local_download_delete_failed"));
                     }
@@ -272,47 +421,6 @@ public final class LocalVideoLibrary {
         params.setMargins(0, 0, 0, dp(context, 10));
         row.setLayoutParams(params);
         return row;
-    }
-
-    private static void play(Context context, LocalVideo video) {
-        Dialog player = new Dialog(context, android.R.style.Theme_DeviceDefault_NoActionBar_Fullscreen);
-        FrameLayout root = new FrameLayout(context);
-        root.setBackgroundColor(Color.BLACK);
-        VideoView view = new VideoView(context);
-        root.addView(view, new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT,
-                Gravity.CENTER));
-
-        Button close = new Button(context);
-        close.setText("×");
-        close.setTextSize(26);
-        close.setTextColor(PRIMARY);
-        close.setBackgroundColor(Color.argb(120, 0, 0, 0));
-        close.setContentDescription(str("morphe_local_download_close"));
-        close.setOnClickListener(ignored -> player.dismiss());
-        FrameLayout.LayoutParams closeParams = new FrameLayout.LayoutParams(
-                dp(context, 56), dp(context, 56), Gravity.TOP | Gravity.END);
-        closeParams.setMargins(0, dp(context, 12), dp(context, 12), 0);
-        root.addView(close, closeParams);
-
-        MediaController controls = new MediaController(context);
-        controls.setAnchorView(view);
-        view.setMediaController(controls);
-        view.setVideoPath(video.videoFile().getAbsolutePath());
-        view.setOnPreparedListener(mediaPlayer -> {
-            mediaPlayer.setScreenOnWhilePlaying(true);
-            view.start();
-            controls.show();
-        });
-        view.setOnErrorListener((mediaPlayer, what, extra) -> {
-            Utils.showToastLong(str("morphe_local_download_play_failed"));
-            return true;
-        });
-
-        player.setContentView(root);
-        player.setOnDismissListener(ignored -> view.stopPlayback());
-        player.show();
-        matchParent(player);
     }
 
     private static TextView text(Context context, String value, int sizeSp, int color) {

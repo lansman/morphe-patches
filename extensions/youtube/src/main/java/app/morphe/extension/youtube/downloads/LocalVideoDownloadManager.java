@@ -18,6 +18,7 @@ import android.media.MediaCodec;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.media.MediaMuxer;
+import android.widget.CheckBox;
 
 import androidx.annotation.Nullable;
 
@@ -104,10 +105,17 @@ public final class LocalVideoDownloadManager {
             return;
         }
 
+        int preferredHeight = LocalVideoDownloadPreferences.preferredHeight(activity);
+        if (!LocalVideoDownloadPreferences.shouldAsk(activity)) {
+            enqueue(activity, videoId, preferredHeight);
+            return;
+        }
+
         Utils.showToastShort(str("morphe_local_download_resolving"));
         Utils.runOnBackgroundThread(() -> {
-            ResolvedMedia media = resolve(videoId, DEFAULT_HEIGHT);
+            ResolvedMedia media = resolve(videoId, preferredHeight);
             Utils.runOnMainThread(() -> {
+                if (activity.isFinishing() || activity.isDestroyed()) return;
                 if (media == null || media.availableHeights().isEmpty()) {
                     Utils.showToastLong(str("morphe_local_download_unavailable"));
                     return;
@@ -117,13 +125,23 @@ public final class LocalVideoDownloadManager {
                 for (int i = 0; i < heights.size(); i++) labels[i] = heights.get(i) + "p";
                 int checked = Math.max(0, heights.indexOf(media.height()));
                 final int[] selected = {checked};
+                CheckBox remember = new CheckBox(activity);
+                remember.setText(str("morphe_local_download_remember_quality"));
+                float density = activity.getResources().getDisplayMetrics().density;
+                remember.setMinHeight(Math.round(48 * density));
+                remember.setPadding(Math.round(20 * density), Math.round(8 * density),
+                        Math.round(20 * density), Math.round(8 * density));
                 new AlertDialog.Builder(activity)
                         .setTitle(str("morphe_local_download_quality_title"))
                         .setSingleChoiceItems(labels, checked,
                                 (dialog, which) -> selected[0] = which)
+                        .setView(remember)
                         .setNegativeButton(android.R.string.cancel, null)
-                        .setPositiveButton(str("morphe_local_download_start"), (dialog, which) ->
-                                enqueue(activity, videoId, heights.get(selected[0])))
+                        .setPositiveButton(str("morphe_local_download_start"), (dialog, which) -> {
+                            int height = heights.get(selected[0]);
+                            LocalVideoDownloadPreferences.save(activity, height, !remember.isChecked());
+                            enqueue(activity, videoId, height);
+                        })
                         .show();
             });
         });
@@ -131,7 +149,7 @@ public final class LocalVideoDownloadManager {
 
     /** Used by the batch queue; it intentionally needs no visible activity or unlocked screen. */
     public static boolean enqueueDefault(Context context, String videoId) {
-        return enqueue(context, videoId, DEFAULT_HEIGHT);
+        return enqueue(context, videoId, LocalVideoDownloadPreferences.preferredHeight(context));
     }
 
     private static boolean enqueue(Context context, String videoId, int height) {

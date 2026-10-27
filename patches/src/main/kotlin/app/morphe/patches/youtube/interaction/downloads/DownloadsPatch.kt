@@ -71,6 +71,11 @@ private val downloadsResourcePatch = resourcePatch {
                 preferences = setOf(
                     ListPreference("morphe_download_mode"),
                     NonInteractivePreference(
+                        key = "morphe_local_download_quality_settings",
+                        tag = "app.morphe.extension.youtube.settings.preference.LocalVideoQualityPreference",
+                        selectable = true
+                    ),
+                    NonInteractivePreference(
                         key = "morphe_local_downloads_open",
                         tag = "app.morphe.extension.youtube.settings.preference.LocalVideoDownloadsPreference",
                         selectable = true

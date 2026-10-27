@@ -131,6 +131,9 @@ public final class LocalVideoStorage {
     public static boolean delete(Context context, LocalVideo video) {
         File directory = directory(context);
         boolean deleted = deleteIfPresent(video.videoFile());
+        // Keep metadata and preview if the media could not be removed.
+        if (!deleted) return false;
+        LocalVideoWatchProgress.clear(context, video.videoId());
         deleted &= deleteIfPresent(video.thumbnailFile());
         deleted &= deleteIfPresent(new File(directory, video.videoId() + ".json"));
         deleted &= deleteIfPresent(new File(directory, video.videoId() + ".video.part"));

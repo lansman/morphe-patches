@@ -67,6 +67,20 @@ Second \"item\" text"</string>
   <string name="morphe_local_downloads_empty">Локальных видео пока нет. Нажмите «Скачать» у нужного видео.</string>
   <string name="morphe_local_downloads_summary">Видео: %1$d · %2$s МБ</string>
   <string name="morphe_local_download_quality_title">Качество видео</string>
+  <string name="morphe_local_download_remember_quality">Запомнить выбор и больше не спрашивать</string>
+  <string name="morphe_local_download_quality_settings_title">Качество загрузки</string>
+  <string name="morphe_local_download_quality_settings_summary">Спрашивать каждый раз или использовать запомненное качество локальных загрузок</string>
+  <string name="morphe_local_download_ask_quality">Спрашивать качество перед каждой ручной загрузкой</string>
+  <string name="morphe_local_download_preferred_quality">Предпочитаемое качество</string>
+  <string name="morphe_local_download_quality_fallback">Если этого качества нет, будет выбрано лучшее из более низких или минимальное доступное. Фоновая очередь использует этот выбор без диалога.</string>
+  <string name="morphe_local_download_delete_watched">Удалить просмотренные (%1$d)</string>
+  <string name="morphe_local_download_delete_watched_title">Удалить просмотренные локальные видео?</string>
+  <string name="morphe_local_download_delete_selected">Удалить (%1$d)</string>
+  <string name="morphe_local_download_delete_result">Удалено: %1$d. Не удалось удалить: %2$d.</string>
+  <string name="morphe_local_download_no_watched">Пока нет просмотренных видео для удаления.</string>
+  <string name="morphe_local_download_progress_note" formatted="false">Просмотрено — воспроизведено не менее 95% видео. Одна перемотка не засчитывается.</string>
+  <string name="morphe_local_download_watched">Просмотрено</string>
+  <string name="morphe_local_download_resume_position">Позиция: %1$s / %2$s</string>
   <string name="morphe_local_download_start">Скачать</string>
   <string name="morphe_local_download_resolving">Подготовка загрузки…</string>
   <string name="morphe_local_download_unavailable">Не найдены совместимые потоки видео и звука</string>

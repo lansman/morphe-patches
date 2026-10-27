@@ -72,6 +72,20 @@ Second \"item\" text"</string>
     <string name="morphe_local_downloads_empty">No local videos yet. Use Download on a video to save it here.</string>
     <string name="morphe_local_downloads_summary">%1$d videos · %2$s MB</string>
     <string name="morphe_local_download_quality_title">Video quality</string>
+    <string name="morphe_local_download_remember_quality">Remember this quality and do not ask again</string>
+    <string name="morphe_local_download_quality_settings_title">Download quality</string>
+    <string name="morphe_local_download_quality_settings_summary">Ask each time or use a remembered quality for local downloads</string>
+    <string name="morphe_local_download_ask_quality">Ask for quality before each manual download</string>
+    <string name="morphe_local_download_preferred_quality">Preferred quality</string>
+    <string name="morphe_local_download_quality_fallback">If this quality is unavailable, use the best lower quality, or the lowest available. The background queue uses this choice without a dialog.</string>
+    <string name="morphe_local_download_delete_watched">Delete watched (%1$d)</string>
+    <string name="morphe_local_download_delete_watched_title">Delete watched local videos?</string>
+    <string name="morphe_local_download_delete_selected">Delete (%1$d)</string>
+    <string name="morphe_local_download_delete_result">Deleted: %1$d. Could not delete: %2$d.</string>
+    <string name="morphe_local_download_no_watched">No watched videos to delete yet.</string>
+    <string name="morphe_local_download_progress_note" formatted="false">Watched means at least 95% actually played. Seeking alone does not count.</string>
+    <string name="morphe_local_download_watched">Watched</string>
+    <string name="morphe_local_download_resume_position">Position: %1$s / %2$s</string>
     <string name="morphe_local_download_start">Download</string>
     <string name="morphe_local_download_resolving">Preparing download…</string>
     <string name="morphe_local_download_unavailable">No compatible video and audio streams were found</string>
